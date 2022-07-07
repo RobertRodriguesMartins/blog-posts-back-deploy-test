@@ -1,0 +1,31 @@
+version: "3"  # optional since v1.27.0
+services:
+  api:
+    container_name: backend
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=root
+      - MYSQL_HOST=db
+      - MYSQL_DATABASE=devMedia
+      - MYSQL_PORT=3306
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    container_name: db
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=devMedia
+    volumes:
+      - ./src/db/migration.sql:/docker-entrypoint-initdb.d/migration.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10

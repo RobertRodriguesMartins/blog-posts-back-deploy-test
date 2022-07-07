@@ -1,0 +1,7 @@
+just for my development :)
+
+to run a mysql script inside mysql use: mysql -u [user] -p[senha] < /home/hitsuri/dev-media-test/backend/src/db/migration.sql 
+in my case i've use: docker exec -i [above command];
+
+to execute direct use: ./src/db/migration.sql:/docker-entrypoint-initdb.d/migration.sql
+the first param is host path file, second above : is docker entrypoint wich executes the migration
