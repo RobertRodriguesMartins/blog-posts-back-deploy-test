@@ -1,12 +1,15 @@
 import { Pool } from "mysql2/promise";
 import NewsEntity, { News, RawNews } from "../interface/News";
 import { RowDataPacket } from "mysql2";
+import { dbConfig } from "./db/connection";
+
+const dbName = dbConfig.database;
 
 class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
   constructor(private db: Pool) {}
 
   private findCategory = async (category: string): Promise<RowDataPacket[]> => {
-    const query = "SELECT name FROM devMedia.category WHERE name = ?";
+    const query = `SELECT name FROM ${dbName}.category WHERE name = ?`;
     const [res] = await this.db.execute<RowDataPacket[]>(query, [category]);
 
     return res;
@@ -14,7 +17,7 @@ class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
 
   public create = async (notice: News): Promise<News | void> => {
     const { title, content, categoryName } = notice;
-    const query1 = `INSERT INTO category(name) VALUES (?);`;
+    const query1 = `INSERT INTO ${dbName}.category(name) VALUES (?);`;
     const query2 = `
       INSERT INTO news(title, content, category_name)
       VALUES (?, ?, ?);`;
@@ -31,7 +34,7 @@ class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
     }
   };
   public findAll = async (): Promise<RawNews[]> => {
-    const query = "SELECT * FROM devMedia.news ORDER BY id DESC;";
+    const query = `SELECT * FROM ${dbName}.news ORDER BY id DESC;`;
     const [data] = await this.db.execute<RowDataPacket[]>(query);
 
     const news = data as RawNews[];
@@ -39,7 +42,7 @@ class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
   };
 
   public exists = async (id: number): Promise<boolean> => {
-    const query = "SELECT 1 FROM devMedia.news WHERE id = ?";
+    const query = `SELECT 1 FROM ${dbName}.news WHERE id = ?`;
     const [[item]] = await this.db.query<RowDataPacket[]>(query, [id]);
 
     if (item) {
@@ -49,7 +52,7 @@ class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
   };
 
   public findById = async (id: number): Promise<RawNews> => {
-    const query = "SELECT * FROM devMedia.news WHERE id = ?";
+    const query = `SELECT * FROM ${dbName}.news WHERE id = ?`;
     const [[item]] = await this.db.query<RowDataPacket[]>(
       { sql: query, rowsAsArray: false },
       [id]
@@ -59,7 +62,7 @@ class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
   };
 
   public maxOffset = async (): Promise<number> => {
-    const query = "SELECT floor(COUNT(*)/6) AS result FROM devMedia.news;";
+    const query = `SELECT floor(COUNT(*)/6) AS result FROM ${dbName}.news;`;
     const [[{result}]] = await this.db.query<RowDataPacket[]>(
       { sql: query, rowsAsArray: false }
     );
@@ -67,7 +70,7 @@ class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
     return Number(result);
   };
   public some = async (offset: number): Promise<RawNews[]> => {
-    const query = "SELECT * FROM devMedia.news LIMIT 6 OFFSET ?";
+    const query = `SELECT * FROM ${dbName}.news LIMIT 6 OFFSET ?`;
     const [items] = await this.db.query<RowDataPacket[]>(
       { sql: query, rowsAsArray: false },
       [offset]

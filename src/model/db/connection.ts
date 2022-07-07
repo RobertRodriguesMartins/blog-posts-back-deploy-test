@@ -3,7 +3,7 @@ import { createPool, Pool, PoolOptions } from 'mysql2/promise';
 
 config();
 
-const dbConfig: PoolOptions  = {
+export const dbConfig: PoolOptions  = {
   host: process.env.MYSQL_HOST,
   database: process.env.MYSQL_DATABASE,
   user: process.env.MYSQL_USER,
