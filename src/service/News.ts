@@ -1,8 +1,8 @@
-import NewsEntity, { News, RawNews } from '../interface/News';
+import NewsEntity, { News, RawNews, TotalNews } from '../interface/News';
 import connection from '../model/db/connection';
 import NewsModel from '../model/News';
 
-class NewsService implements NewsEntity<News> {
+class NewsService implements NewsEntity<News | TotalNews> {
   private newsModel: NewsModel = new NewsModel(connection);
 
   private hidrate = <T extends RawNews[] | RawNews>(notice: T): News | News[] => {
@@ -30,10 +30,9 @@ class NewsService implements NewsEntity<News> {
     return this.newsModel.create(notice);
   }
 
-  public findAll = async (): Promise<News[]> => {
+  public findAll = async (): Promise<TotalNews> => {
     const rawData = await this.newsModel.findAll()
-    const data = this.hidrate<RawNews[]>(rawData)
-    return data as News[]
+    return rawData;
   }
 
   public exists = async (id: number): Promise<boolean> => {
