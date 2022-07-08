@@ -12,7 +12,9 @@ export interface RawNews {
   category_name: string
 }
 
-export default interface NewsEntity<T extends News | RawNews | RawNews[]> {
+export type totalNews = {total: number}
+
+export default interface NewsEntity<T extends News | RawNews | RawNews[] | totalNews> {
   findAll(params: T): Promise<T | News[] | void>
   create(params: T): Promise<T | void>
 }
