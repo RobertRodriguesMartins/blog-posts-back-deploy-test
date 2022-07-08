@@ -1,11 +1,11 @@
 import { Pool } from "mysql2/promise";
-import NewsEntity, { News, RawNews } from "../interface/News";
+import NewsEntity, { News, RawNews, TotalNews } from "../interface/News";
 import { RowDataPacket } from "mysql2";
 import { dbConfig } from "./db/connection";
 
 const dbName = dbConfig.database;
 
-class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
+class NewsModel implements NewsEntity<News | RawNews | RawNews[] | TotalNews> {
   constructor(private db: Pool) {}
 
   private findCategory = async (category: string): Promise<RowDataPacket[]> => {
@@ -33,12 +33,12 @@ class NewsModel implements NewsEntity<News | RawNews | RawNews[]> {
       throw new Error("something wrong happened");
     }
   };
-  public findAll = async (): Promise<RawNews[]> => {
-    const query = `SELECT * FROM ${dbName}.news ORDER BY id DESC;`;
-    const [data] = await this.db.execute<RowDataPacket[]>(query);
+  public findAll = async (): Promise<TotalNews> => {
+    const query = `SELECT COUNT(*) total FROM ${dbName}.news;`;
+    const [[data]] = await this.db.execute<RowDataPacket[]>(query);
 
-    const news = data as RawNews[];
-    return news;
+    const newsCount = data as TotalNews;
+    return newsCount;
   };
 
   public exists = async (id: number): Promise<boolean> => {
