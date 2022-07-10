@@ -69,8 +69,8 @@ class NewsModel implements NewsEntity<News | RawNews | RawNews[] | TotalNews> {
 
     return Number(result);
   };
-  public some = async (offset: number): Promise<RawNews[]> => {
-    const query = `SELECT * FROM ${dbName}.news ORDER BY id DESC LIMIT 6 OFFSET ?;`;
+  public  some = async (offset: number): Promise<RawNews[]> => {
+    const query = `SELECT * FROM ${dbName}.news ORDER BY id DESC LIMIT 10 OFFSET ?;`;
     const [items] = await this.db.query<RowDataPacket[]>(
       { sql: query, rowsAsArray: false },
       [offset]
